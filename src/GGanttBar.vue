@@ -1,20 +1,14 @@
 <template>
   <div>
-    <!-- @mouseenter.stop="onMouseenter($event)"
-      @mouseleave.stop="onMouseleave($event)" @mousedown.stop="onMousedown($event)" @click.stop="onClick($event)"
-      @dblclick="onDblclick($event)" @contextmenu="onContextmenu($event)" -->
     {{ mouseOver }}
     <div class="g-gantt-bar" ref="g-gantt-bar" style="cursor: pointer; background: #8ee997;" :style="barStyle">
-
-      <div class="g-gantt-bar-label" @mousedown.stop="startDrag($event, bar, 'drag')">
-        <span style="">
-          <!-- {{ bar.myStart | TimeFilter }} - {{ bar.myEnd | TimeFilter }} --> Task
+      <div class="g-gantt-bar-label" @mousedown.left.stop="startDrag($event, bar, 'drag')">
+        <span style=""> Task
         </span>
         <slot name="bar-label" :bar="bar">
           {{ barConfig.label || "" }}
         </slot>
       </div>
-      <!-- v-if="barConfig.handles" -->
       <template>
         <div @mousedown.stop="startDrag($event, bar, 'start')" class="g-gantt-bar-handle-left"></div>
         <div @mousedown.stop="startDrag($event, bar, 'end')" class="g-gantt-bar-handle-right"></div>
@@ -27,7 +21,6 @@
         <div class="color-indicator" :style="{ background: this.barStyle.background || this.barStyle.backgroundColor }">
         </div>
         {{ bar.myStart | TimeFilter }} - {{ bar.myEnd | TimeFilter }}
-
       </div>
     </transition>
 
@@ -38,14 +31,12 @@
 import moment from 'moment'
 
 export default {
-  name: "GGanttBarNew",
-
+  name: "GGanttBar",
   props: {
     widthAxis: { type: Number },
     chartStart: { type: String },
     chartEnd: { type: String },
     rectC: { type: [Object, DOMRect] },
-    // barContainerWidth: { type: Number },
     bar: { type: Object },
     barStart: { type: String }, // property name of the bar objects that represents the start datetime
     barEnd: { type: String }, // property name of the bar objects that represents the end datetime,
@@ -69,47 +60,20 @@ export default {
       barStartBeforeDrag: null,
       barEndBeforeDrag: null,
 
-
-
-      // unit: 'month', // Initial zoom level
-      // totalDays: 30, // Number of days in a month
-      // totalMonths: 12, // Number of months in a year
       draggedTask: null,
       dragEdge: null,
-      // initialX: 0,
-      // initialStart: 0,
-      // initialDuration: 0,
-
       initialX1: 0,
       initialX2: 0,
       dragX1: 0,
       dragX2: 0
     }
   },
-
+  filters: {
+    TimeFilter(value) {
+      return moment(value, 'YYYY-MM-DD HH:mm').format("DD-MM-YYYY HH:mm")
+    }
+  },
   computed: {
-
-    // use these computed moment objects to work with the bar's start/end dates:
-    // instead of directly mutating them:
-    // barStartMoment: {
-    //   get() {
-    //     return moment(this.bar[this.barStart])
-    //   },
-    //   /* eslint-disable */
-    //   set(value) {
-    //     this.bar[this.barStart] = moment(value).format("YYYY-MM-DD HH:mm:ss")
-    //   }
-    // },
-
-    // barEndMoment: {
-    //   get() {
-    //     return moment(this.bar[this.barEnd])
-    //   }
-    //   ,
-    //   set(value) {
-    //     this.bar[this.barEnd] = moment(value).format("YYYY-MM-DD HH:mm:ss")
-    //   }
-    // },
 
     barConfig() {
       if (this.bar.ganttBarConfig) {
@@ -160,33 +124,22 @@ export default {
       this.initialX2 = this.mapTimeToPosition(this.bar.myEnd)
       this.dragX1 = event.clientX - this.rectC.left
 
-      // this.initialStart = task.myStart;
-
       document.addEventListener('mousemove', this.handleDrag);
       document.addEventListener('mouseup', this.stopDrag);
     },
     handleDrag(event) {
       if (this.isDragging) {
-        // const deltaX = event.clientX - this.initialX;
         this.dragX2 = (event.clientX - this.rectC.left) - this.dragX1
-        // console.log(event.clientX, this.dragX1, this.dragX2)
         if (this.dragEdge === 'start') {
           console.log('start')
-          // console.log('start', event)
           this.draggedTask.myStart = this.mapPositionToTime(event.clientX - this.rectC.left)
-          // console.log(this.mapPositionToTime(event.clientX))
         } else if (this.dragEdge === 'end') {
           console.log('end')
           this.draggedTask.myEnd = this.mapPositionToTime(event.clientX - this.rectC.left)
-          // this.draggedTask.duration = Math.max(1, this.initialDuration + deltaX / 30);
         } else if (this.dragEdge === 'drag') {
           console.log('drag')
-          // let startTask = this.mapTimeToPosition(this.draggedTask.myStart)
-          // console.log(startTask)
           this.draggedTask.myStart = this.mapPositionToTime(this.initialX1 + this.dragX2)
           this.draggedTask.myEnd = this.mapPositionToTime(this.initialX2 + this.dragX2)
-          // this.draggedTask.myStart = this.mapPositionToTime(event.clientX - this.rectC.left)
-
         }
       }
     },
@@ -205,42 +158,15 @@ export default {
       let momentChartEnd = moment(this.chartEnd, 'YYYY-MM-DD HH:mm')
       return Math.floor(momentChartEnd.diff(momentChartStart, "hour", true))
     },
-    /* --------------------------------------------------------- */
-    /* ------- MAPPING POSITION TO TIME (AND VICE VERSA) ------- */
-    /* --------------------------------------------------------- */
+    // ------- Mapping position to time and vice versa ------- 
     mapTimeToPosition(time) {
       let hourDiffFromStart = moment(time, 'YYYY-MM-DD HH:mm').diff(this.chartStartMoment, "hour", true)
-      // console.log('hourd', hourDiffFromStart)
-      // console.log('gh', this.getHourCount())
-      // console.log(this.rectC.width)
       return (hourDiffFromStart / this.getHourCount()) * this.widthAxis
     },
     mapPositionToTime(xPos) {
       let hourDiffFromStart = (xPos / this.widthAxis) * this.getHourCount()
       return this.chartStartMoment.clone().add(hourDiffFromStart, "hours")
     },
-    // onMousedown(e) {
-    //   e.preventDefault()
-    //   if (e.button === 2) {
-    //     return
-    //   }
-    //   if (!this.barConfig.immobile && !this.barConfig.isShadow) {
-    //     this.setDragLimitsOfGanttBar(this)
-    //     window.addEventListener("mousemove", this.onFirstMousemove, { once: true })
-    //     window.addEventListener("mouseup",
-    //       () => window.removeEventListener("mousemove", this.onFirstMousemove),
-    //       { once: true }
-    //     )
-    //   }
-    //   const time = this.mapPositionToTime(e.clientX - this.barContainer.left).format("YYYY-MM-DD HH:mm:ss")
-    //   this.onBarEvent({ event: e, type: e.type, time }, this)
-    // },
-  },
-
-  filters: {
-    TimeFilter(value) {
-      return moment(value, 'YYYY-MM-DD HH:mm').format("DD-MM-YYYY HH:mm")
-    }
   },
 
 
