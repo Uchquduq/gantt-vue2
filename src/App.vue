@@ -17,8 +17,6 @@
       <div ref="scrollableDiv" class="rf-grantt-grid"
         style="display: flex; flex-direction: row; height: 45px; position: relative;" v-for="row in rowList"
         :key="row.label">
-
-        <!-- v-for=" ok in  axisDays" :key="ok.value" -->
         <div class="rf-grantt-grid-row-1" v-for=" ok in  axisDays" :key="ok.value">
           <div :class="{ 'rf-grantt-grid-hour-cell': n < 9 && n < 18 }" v-for="n in hours " :key="n"
             class="rf-grantt-grid-cell-1"></div>
@@ -33,7 +31,6 @@
 </template>
 
 <script>
-// import GGanttChart from './GGanttChart.vue'
 import GGanttBar from './GGanttBar.vue'
 import moment from 'moment'
 
@@ -44,11 +41,9 @@ export default {
 
   data() {
     return {
-      // row
       chartStart: "2020-03-05 00:00",
       chartEnd: "2020-03-11 00:00",
 
-      scrollableDiv: '',
       rectC: {},
       barContainer: {},
       barContainerWidth: 0,
@@ -628,9 +623,7 @@ export default {
     this.rectC = barContainer.getBoundingClientRect();
   },
   updated() {
-    this.scrollableDiv = this.$refs.scrollableDiv
-    // console.log('upd', this.$refs.barContainer.getBoundingClientRect())
-    // this.barContainerWidth = this.barContainer.scrollWidth
+
   },
 
   methods: {
@@ -641,10 +634,8 @@ export default {
       return Math.floor(momentChartEnd.diff(momentChartStart, "hour", true))
     },
     getMouseCoordinates() {
-      // Проверяем, доступен ли элемент $refs.scrollableDiv
       if (this.$refs.barContainer) {
         const barContainer = this.$refs.barContainer;
-        // console.log(barContainer)
         this.rectC = barContainer.getBoundingClientRect();
         // Координаты мыши относительно верхнего левого угла прокручиваемого div
         // const mouseX = event.clientX - this.rectC.left;
@@ -686,12 +677,7 @@ export default {
       }
       return axisDayObject
     },
-
-    onScroll($event) {
-      console.log($event)
-    }
   }
-
 }
 </script>
 
