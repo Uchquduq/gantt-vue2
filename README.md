@@ -1,4 +1,5 @@
 # app
+![Gantt Screen](screen.png)
 
 ## Project setup
 ```
