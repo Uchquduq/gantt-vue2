@@ -1,39 +1,60 @@
 <template>
-  <div>
-    <div class="rf-grantt-timeaxis">
-      <div class="rf-grantt-timeaxis-row-0">
-        <div class="rf-grantt-timeaxis-cell-0" :style="{ minWidth: widthDefaults + 'px' }" v-for="item in axisDays"
-          :key="item.value">
-          {{ item.value }}
+  <div style="position: relative;">
+    <div class="rh-gantt-top-bar">
+      <div class="rh-gantt-top-bar-buttons">
+        <div><i class="mdi mdi-magnify-minus"></i></div>
+        <div><i class="mdi mdi-magnify-plus"></i> </div>
+        <div><i class="fas fa-angle-left"></i></div>
+        <div><i class="fas fa-angle-right"></i></div>
+      </div>
+    </div>
+    <div style="display: flex; width: max-content; ">
+      <div class="rh-gantt-users-column">
+        <div class="rh-gantt-users-column-name">
+          Name
+        </div>
+        <div class="rh-gantt-users-column-row" v-for="row in rowList" :key="row.label">
+          <div class="rh-gantt-users-column-number">
+            {{ row.label }}
+          </div>
+          <div style="display: flex;">
+            <img src="./assets/img/dan.jpg" alt="" class="rh-gantt-users-column-img">
+            <div class="rh-gantt-users-column-fullname"> User Name Last Name</div>
+          </div>
         </div>
       </div>
-      <div style="display: flex; flex-direction: row;">
-        <div class="rf-grantt-timeaxis-row-1" v-for="s in axisDays" :key="s.value">
-          <div v-for="h  in hours" :key="h" class="rf-grantt-timeaxis-cell-1">{{ h }}</div>
+      <div>
+        <div class="rf-grantt-timeaxis">
+          <div class="rf-grantt-timeaxis-row-0">
+            <div class="rf-grantt-timeaxis-cell-0" :style="{ minWidth: widthDefaults + 'px' }" v-for="item in axisDays"
+              :key="item.value">
+              {{ item.value }}
+            </div>
+          </div>
+          <div style="display: flex; flex-direction: row;">
+            <div class="rf-grantt-timeaxis-row-1" v-for="s in axisDays" :key="s.value">
+              <div v-for="h  in hours" :key="h" class="rf-grantt-timeaxis-cell-1">{{ h }}</div>
+            </div>
+          </div>
+        </div>
+        <div ref="barContainer" class="rh-gantt-bar-container" id="scrollable" @mousemove="getMouseCoordinates">
+          <div class="rf-grantt-grid" style="display: flex; flex-direction: row; height: 45px; position: relative;"
+            v-for="row in rowList" :key="row.label">
+            <div class="rf-grantt-grid-row-1" v-for=" ok in  axisDays" :key="ok.value">
+              <div :class="{ 'rf-grantt-grid-hour-cell': n < 9 && n < 18 }" v-for="n in hours " :key="n"
+                class="rf-grantt-grid-cell-1"></div>
+            </div>
+            <g-gantt-bar v-for="bar in row.barList" :key="bar.id" :bar="bar" ref="ganttBar" :bar-start="bar.barStart"
+              :bar-end="bar.barEnd" :all-bars-in-row="row.barList" :rectC="rectC" :chartStart="chartStart"
+              :chartEnd="chartEnd" :widthAxis="widthAxis" />
+          </div>
         </div>
       </div>
     </div>
-    <div ref="barContainer" @mousemove="getMouseCoordinates">
-      <div ref="scrollableDiv" class="rf-grantt-grid"
-        style="display: flex; flex-direction: row; height: 45px; position: relative;" v-for="row in rowList"
-        :key="row.label">
-
-        <!-- v-for=" ok in  axisDays" :key="ok.value" -->
-        <div class="rf-grantt-grid-row-1" v-for=" ok in  axisDays" :key="ok.value">
-          <div :class="{ 'rf-grantt-grid-hour-cell': n < 9 && n < 18 }" v-for="n in hours " :key="n"
-            class="rf-grantt-grid-cell-1"></div>
-        </div>
-        <g-gantt-bar v-for="bar in row.barList" :key="bar.id" :bar="bar" ref="ganttBar" :bar-start="bar.barStart"
-          :bar-end="bar.barEnd" :all-bars-in-row="row.barList" :rectC="rectC" :chartStart="chartStart"
-          :chartEnd="chartEnd" :widthAxis="widthAxis" />
-      </div>
-    </div>
-    {{ rowList }}
   </div>
 </template>
 
 <script>
-// import GGanttChart from './GGanttChart.vue'
 import GGanttBar from './GGanttBar.vue'
 import moment from 'moment'
 
@@ -44,11 +65,9 @@ export default {
 
   data() {
     return {
-      // row
-      chartStart: "2020-03-05 00:00",
-      chartEnd: "2020-03-11 00:00",
+      chartStart: "2020-03-07 00:00",
+      chartEnd: "2020-03-15 00:00",
 
-      scrollableDiv: '',
       rectC: {},
       barContainer: {},
       barContainerWidth: 0,
@@ -59,7 +78,7 @@ export default {
       hourCount: null,
       rowList: [
         {
-          label: "Row #1",
+          label: "1",
           barList: [
             {
               id: '1',
@@ -100,7 +119,7 @@ export default {
         },
 
         {
-          label: "Row #2",
+          label: "2",
           barList: [
             {
               myStart: "2020-03-06 09:00",
@@ -125,7 +144,7 @@ export default {
         },
 
         {
-          label: "Row #3",
+          label: "3",
           barList: [
             {
               myStart: "2020-03-09 09:00",
@@ -155,7 +174,7 @@ export default {
         },
 
         {
-          label: "Row #4",
+          label: "4",
           barList: [
             {
               myStart: "2020-03-08 06:30",
@@ -172,7 +191,7 @@ export default {
           ]
         },
         {
-          label: "Row #5",
+          label: "5",
           barList: [
             {
               id: '1',
@@ -212,7 +231,7 @@ export default {
           ]
         },
         {
-          label: "Row #6",
+          label: "6",
           barList: [
             {
               id: '1',
@@ -252,7 +271,7 @@ export default {
           ]
         },
         {
-          label: "Row #7",
+          label: "7",
           barList: [
             {
               id: '1',
@@ -292,7 +311,7 @@ export default {
           ]
         },
         {
-          label: "Row #8",
+          label: "8",
           barList: [
             {
               id: '1',
@@ -332,7 +351,7 @@ export default {
           ]
         },
         {
-          label: "Row #9",
+          label: "9",
           barList: [
             {
               id: '1',
@@ -372,7 +391,7 @@ export default {
           ]
         },
         {
-          label: "Row #10",
+          label: "10",
           barList: [
             {
               id: '1',
@@ -412,7 +431,7 @@ export default {
           ]
         },
         {
-          label: "Row #11",
+          label: "11",
           barList: [
             {
               id: '1',
@@ -452,7 +471,7 @@ export default {
           ]
         },
         {
-          label: "Row #12",
+          label: "12",
           barList: [
             {
               id: '1',
@@ -492,7 +511,7 @@ export default {
           ]
         },
         {
-          label: "Row #13",
+          label: "13",
           barList: [
             {
               id: '1',
@@ -532,7 +551,7 @@ export default {
           ]
         },
         {
-          label: "Row #14",
+          label: "14",
           barList: [
             {
               id: '1',
@@ -572,7 +591,7 @@ export default {
           ]
         },
         {
-          label: "Row #15",
+          label: "15",
           barList: [
             {
               id: '1',
@@ -612,7 +631,54 @@ export default {
           ]
         },
 
-
+        {
+          label: "16",
+          barList: [
+            {
+              myStart: "2020-03-06 09:00",
+              myEnd: "2020-03-06 18:00",
+              image: "vue_ganttastic_logo_no_text.png",
+              label: "I have an image",
+              ganttBarConfig: { color: "white", backgroundColor: "#de3b26", bundle: "redBundle" }
+            },
+            {
+              myStart: "2020-03-07 04:00",
+              myEnd: "2020-03-07 15:00",
+              label: "We belong together ^",
+              ganttBarConfig: { color: "white", backgroundColor: "#2e74a3", bundle: "blueBundle" }
+            },
+            {
+              myStart: "2020-03-08 18:00",
+              myEnd: "2020-03-08 22:00",
+              label: "Bar",
+              ganttBarConfig: { color: "white", backgroundColor: "#aa34a3" }
+            }
+          ]
+        },
+        {
+          label: "17",
+          barList: [
+            {
+              myStart: "2020-03-06 09:00",
+              myEnd: "2020-03-06 18:00",
+              image: "vue_ganttastic_logo_no_text.png",
+              label: "I have an image",
+              ganttBarConfig: { color: "white", backgroundColor: "#de3b26", bundle: "redBundle" }
+            },
+            {
+              myStart: "2020-03-07 04:00",
+              myEnd: "2020-03-07 15:00",
+              label: "We belong together ^",
+              ganttBarConfig: { color: "white", backgroundColor: "#2e74a3", bundle: "blueBundle" }
+            },
+            {
+              myStart: "2020-03-08 18:00",
+              myEnd: "2020-03-08 22:00",
+              label: "Bar",
+              ganttBarConfig: { color: "white", backgroundColor: "#aa34a3" }
+            }
+          ]
+        },
       ]
     }
   },
@@ -622,18 +688,25 @@ export default {
     }
   },
   mounted() {
+
     this.initAxisDaysAndHours()
     this.barContainer = this.$refs.barContainer
     const barContainer = this.barContainer
     this.rectC = barContainer.getBoundingClientRect();
+    document.addEventListener('scroll', this.handleScroll);
   },
   updated() {
-    this.scrollableDiv = this.$refs.scrollableDiv
-    // console.log('upd', this.$refs.barContainer.getBoundingClientRect())
-    // this.barContainerWidth = this.barContainer.scrollWidth
+
+  },
+  beforeDestroy() {
+    // Ensure to remove the scroll event listener when the component is destroyed
+    document.removeEventListener('scroll', this.handleScroll);
   },
 
   methods: {
+    handleScroll(event) {
+      console.log("Scroll position:", event.target.scrollTop);
+    },
     getHourCount() {
       let momentChartStart = moment(this.chartStart, 'YYYY-MM-DD HH:mm')
       let momentChartEnd = moment(this.chartEnd, 'YYYY-MM-DD HH:mm')
@@ -641,10 +714,8 @@ export default {
       return Math.floor(momentChartEnd.diff(momentChartStart, "hour", true))
     },
     getMouseCoordinates() {
-      // Проверяем, доступен ли элемент $refs.scrollableDiv
       if (this.$refs.barContainer) {
         const barContainer = this.$refs.barContainer;
-        // console.log(barContainer)
         this.rectC = barContainer.getBoundingClientRect();
         // Координаты мыши относительно верхнего левого угла прокручиваемого div
         // const mouseX = event.clientX - this.rectC.left;
@@ -666,7 +737,6 @@ export default {
         this.axisDays.push(this.getAxisDayObject(start, widthPercentage, endHour))
         start.add(1, "day").hour(0)
       }
-
     },
     getAxisDayObject(datetime, widthPercentage, endHour) {
       let datetimeMoment = moment(datetime, 'YYYY-MM-DD HH:mm')
@@ -686,20 +756,107 @@ export default {
       }
       return axisDayObject
     },
-
-    onScroll($event) {
-      console.log($event)
-    }
   }
-
 }
 </script>
 
 <style>
+#scrollabe {
+  overflow-y: auto;
+}
+
+.rh-gantt-bar-container {
+  margin-top: 104px;
+}
+
+.rh-gantt-users-column-fullname {
+  font-weight: 500;
+  font-family: sans-serif;
+  margin-left: 7px;
+  display: flex;
+  justify-content: start;
+  align-items: center;
+  font-size: 14px;
+  width: 180px;
+  color: rgb(102, 114, 128);
+}
+
+.rh-gantt-users-column-img {
+  min-width: 37px;
+  max-width: 37px;
+  height: 37px;
+  border-radius: 30px;
+  margin: 4px;
+  object-fit: cover;
+  border: 1px solid #e9eaeb;
+  padding: 2px;
+}
+
+.rh-gantt-users-column-name {
+  display: flex;
+  position: sticky;
+  top: 104px;
+  z-index: 9999;
+  background: rgb(243, 244, 245);
+  height: 58px;
+  box-shadow: rgba(0, 0, 0, 0.08) 0px 2px 4px;
+  border-bottom: 1px solid #e9eaeb;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  color: #667280;
+  font-size: 14px;
+  font-family: sans-serif;
+}
+
+.rh-gantt-users-column-row {
+  border-bottom: 1px solid #e9eaeb;
+  height: 45px;
+  display: flex;
+  flex-direction: row;
+}
+
+.rh-gantt-users-column-number {
+  border-inline: 1px solid rgb(233, 234, 235);
+  width: 60px;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  color: rgb(102, 114, 128);
+  font-size: 14px;
+  font-weight: 500;
+  color: #667280;
+  font-family: sans-serif;
+}
+
+.rh-gantt-users-column {
+  position: sticky;
+  z-index: 99990;
+  left: 0;
+  background: white;
+  min-width: 260px;
+  border-right: 7px solid #e5e5e8;
+  margin-top: 104px;
+}
+
+.rh-gantt-top-bar {
+  display: flex;
+  justify-content: start;
+  position: fixed;
+  left: 0px;
+  z-index: 99999;
+  top: 52px;
+  min-width: 100vw;
+  background: rgb(243, 244, 245);
+  border-bottom: 1px solid #e5e5e8;
+  height: 52px;
+}
+
 .rf-grantt-timeaxis {
   position: sticky;
   box-shadow: 0 2px 4px rgba(0, 0, 0, .0784313725490196);
-  top: 0px;
+  top: 104px;
   z-index: 9999;
 }
 
@@ -721,6 +878,9 @@ export default {
   align-items: center;
   justify-content: center;
   color: #667280;
+  font-family: sans-serif;
+  font-size: 14px;
+  font-weight: 500;
 }
 
 .rf-grantt-timeaxis-row-1 {
@@ -732,7 +892,7 @@ export default {
 
 .rf-grantt-timeaxis-cell-1 {
   /* background: grey; */
-  font-size: 10px;
+  font-size: 9px;
   width: 15px;
   text-align: center;
   border-inline-end: 1px solid #d8d9da;
@@ -742,6 +902,7 @@ export default {
   justify-content: center;
   font-weight: 500;
   color: #667280;
+  font-family: sans-serif;
 }
 
 .rf-grantt-grid-row-1 {
