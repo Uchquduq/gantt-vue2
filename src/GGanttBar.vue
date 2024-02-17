@@ -1,9 +1,9 @@
 <template>
   <div>
-    {{ mouseOver }}
-    <div class="g-gantt-bar" ref="g-gantt-bar" style="cursor: pointer; background: #8ee997;" :style="barStyle">
-      <div class="g-gantt-bar-label" @mousedown.left.stop="startDrag($event, bar, 'drag')">
-        <span style=""> Task
+    <div class="g-gantt-bar" ref="g-gantt-bar" style="cursor: pointer; background: rgba(0, 171, 85, 0.7);"
+      :style="barStyle">
+      <div class="g-gantt-bar-label" @mousedown.left.stop="startDrag($event, bar, 'drag')" @dblclick="showTaskInfo(bar)">
+        <span style=""> {{ bar.label }}
         </span>
         <slot name="bar-label" :bar="bar">
           {{ barConfig.label || "" }}
@@ -14,6 +14,8 @@
         <div @mousedown.stop="startDrag($event, bar, 'end')" class="g-gantt-bar-handle-right"></div>
       </template>
     </div>
+
+
 
     <transition name="fade" mode="out-in">
       <div style="white-space: nowrap;" v-if="!barConfig.noTooltip && (showTooltip || isDragging)" class="g-gantt-tooltip"
@@ -93,6 +95,7 @@ export default {
         ...(this.barConfig || {}),
         left: `${xStart}px`,
         width: `${xEnd - xStart}px`,
+        background: this.bar?.task_state == 'ESTIMATED' ? '#0177c0!important' : (this.bar?.task_state == 'DONE' ? '#f18a2d' : (this.bar?.task_state == 'CLOSED' ? '#7e349d' : (this.bar?.task_state == 'NEW' ? '#00AB55' : (this.bar?.task_state == 'CANCELED' ? '#e74c3c' : (this.bar?.task_state == 'IN_PROCESS' ? '#FFC107' : '#08aba0'))))),
         // height: `${this.ganttChartProps.rowHeight - 6}px`,
         zIndex: this.barConfig.zIndex || (this.isDragging ? 2 : 1)
       }
@@ -115,6 +118,12 @@ export default {
   },
 
   methods: {
+    showTaskInfo(bar) {
+      if (bar && bar.id) {
+        let url = 'forms/task_view/' + bar.id + '?_target=modal_1100'
+        this.$root.navigateTo(url)
+      }
+    },
     startDrag(event, task, edge) {
       this.isDragging = true;
       this.draggedTask = task;
@@ -169,12 +178,12 @@ export default {
     },
   },
 
-
 }
 </script>
 
 <style scoped>
 .g-gantt-bar {
+  font-family: sans-serif;
   position: absolute;
   top: 8px;
   left: 30px;
@@ -183,9 +192,12 @@ export default {
   align-items: center;
   color: white;
   width: 300px;
+  font-weight: 400;
+  font-size: 14px;
   height: 28px;
   border-radius: 4px;
-  background: #79869c;
+  background: #53a653;
+  /*   background: #79869c; */
   overflow: hidden;
 }
 
@@ -263,23 +275,5 @@ export default {
   height: 8px;
   border-radius: 100%;
   margin-right: 4px;
-}
-
-.fade-enter-active {
-  animation: fade-in .3s;
-}
-
-.fade-leave-active {
-  animation: fade-in .3s reverse;
-}
-
-@keyframes fade-in {
-  from {
-    opacity: 0;
-  }
-
-  to {
-    opacity: 1;
-  }
 }
 </style>
